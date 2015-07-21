@@ -25,7 +25,7 @@ addons:
       - ghc-7.10.1
 
 before_install:
-  - export PATH=$(printf "%s:" /opt/ghc/*/bin)$(printf "%s:" /opt/cabal/*/bin)$PATH
+  - export PATH=$HOME/.cabal/bin:$(printf "%s:" /opt/ghc/*/bin)$(printf "%s:" /opt/cabal/*/bin)$PATH
   - travis_retry cabal update
   - travis_retry cabal install -j pandoc
 
