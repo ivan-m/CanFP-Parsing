@@ -265,6 +265,118 @@ failParser :: String -> Parser a
 failParser err = P $ \str -> (Err err, str)
 ~~~
 
+## Get some data
+
+~~~haskell
+-- Obtain the next character in the input string.
+next :: Parser Char
+next = P $ \str -> case str of
+                     c:str' -> (OK c, str')
+                     _      -> (Err "empty", str)
+~~~
+
+## Matching a predicate
+
+~~~haskell
+satisfy :: (Char -> Bool) -> Parser Char
+satisfy p = P $ \str ->
+  case str of
+    c:str' | p c       -> (OK c, str')
+           | otherwise -> (Err "not satisfied", str)
+    _                  -> (Err "empty", str)
+~~~
+
+Notes
+:   * When parsing an integer, we want `isDigit`
+    * This looks an awful lot like `next`
+    * Idea: call next, get the result, then act on it.
+
+## Matching again
+
+~~~haskell
+-- Take the result from one parser, and pass it as a parameter to a
+-- function that returns a parser.
+inject :: Parser a -> (a -> Parser b) -> Parser b
+inject pa fpb = P $ \str -> case runP pa str of
+                              (OK a,  str') -> runP (fpb a) str'
+                              (Err e, str') -> (Err e, str')
+
+satisfy :: (Char -> Bool) -> Parser Char
+satisfy p = next `inject` checkNext
+  where
+    checkNext c
+      | p c       = toParser c
+      | otherwise = failParser "not satisfied"
+~~~
+
+Notes
+:   * Better!
+    * `inject` is a handy concept
+
+## Getting multiple digits
+
+~~~haskell
+import Data.Char(isDigit)
+
+atLeastOnce :: Parser a -> [Parser a]
+atLeastOnce = -- to be implemented
+
+parseIntDigits :: Parser String
+parseIntDigits = atLeastOnce (satisfy isDigit)
+~~~
+
+Notes
+:   * Ignoring negative numbers for now
+    * Sample code has it implemented though
+
+## But I want a number!
+
+Need to convert a `String` to an `Int`...
+
+. . .
+
+~~~haskell
+-- Apply a function on the result of a parser.
+mapParser :: (a -> b) -> Parser a -> Parser b
+mapParser f pa = P $ \str -> case runP pa str of
+                               (OK a,  str') -> (OK (f a), str')
+                               (Err e, str') -> (Err e, str')
+
+parseInt :: Parse Int
+parseInt = mapParser read parseIntDigits
+~~~
+
+Notes
+:   * Talk about `read`
+    * Real code, might use something better
+
+## That function looks familiar
+
+~~~haskell
+mapParser :: (a -> b) -> Parser a  -> Parser b
+
+map       :: (a -> b) ->       [a] ->       [b]
+
+-- Let's generalise
+
+mapF      :: (a -> b) -> f      a  -> f      b
+~~~
+
+## That's Func-tastic!
+
+
+~~~haskell
+class Functor f where
+  fmap :: (a -> b) -> f a -> f b
+
+instance Functor Parser where
+  fmap = mapParser
+~~~
+
+With the handy in-fix alias of `<$>`.
+
+Notes
+:   * `<$>` vs `$`
 
 ---
 # License links
