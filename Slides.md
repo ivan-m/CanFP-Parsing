@@ -166,6 +166,72 @@ data Bencode = BInt Int
 Defining the Parser
 ===================
 
+## What is a parser?
+
+
+~~~haskell
+type Parser a = String -> a
+~~~
+
+Notes
+:   * Most basic definition of what a parser is
+    * Is that it?
+
+## Consider parsing an integer
+
+> * Let's parse `i42e`
+> * Imagine a function `next :: Parser Char`
+
+Notes
+:   * I first need to get the first char to get `i`
+    * Now what?
+
+## Attempt 2
+
+~~~haskell
+type Parser a = String -> (a, String)
+~~~
+
+Notes
+:   * Returns un-consumed input
+    * What happens if it _isn't_ an integer?
+
+## Attempt 3
+
+~~~haskell
+-- The result of a parser: either an error or the expected result.
+data Result a = Err String
+              | OK a
+              deriving (Show)
+
+type Parser a = String -> (Result a, String)
+~~~
+
+Notes
+:   * Up to isomorphism of how result is returned
+    * Complete in terms of being able to work
+    * Can be bypassed
+
+## Final definition
+
+
+~~~haskell
+newtype Parser a = P { runP :: String -> (Result a, String) }
+~~~
+
+. . .
+
+
+~~~haskell
+-- Shhhhhh!!!!!
+newtype State s a = St { runState :: s -> (a, s) }
+~~~
+
+Notes
+:   * Don't export constructor
+    * `runP` runs the parser
+    * Specialised version of State Monad
+
 ---
 # reveal.js settings
 theme: night
