@@ -1,1 +1,226 @@
-My Page
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Ivan Lazar Miljenovic" />
+  <title>l7Parsing7:Bencodee</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css"/>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #303030; color: #cccccc; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #cccccc; background-color: #303030; }
+code > span.kw { color: #f0dfaf; } /* Keyword */
+code > span.dt { color: #dfdfbf; } /* DataType */
+code > span.dv { color: #dcdccc; } /* DecVal */
+code > span.bn { color: #dca3a3; } /* BaseN */
+code > span.fl { color: #c0bed1; } /* Float */
+code > span.ch { color: #dca3a3; } /* Char */
+code > span.st { color: #cc9393; } /* String */
+code > span.co { color: #7f9f7f; } /* Comment */
+code > span.ot { color: #efef8f; } /* Other */
+code > span.al { color: #ffcfaf; } /* Alert */
+code > span.fu { color: #efef8f; } /* Function */
+code > span.er { color: #c3bf9f; } /* Error */
+code > span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+code > span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code > span.sc { color: #dca3a3; } /* SpecialChar */
+code > span.vs { color: #cc9393; } /* VerbatimString */
+code > span.ss { color: #cc9393; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { } /* Variable */
+code > span.cf { color: #f0dfaf; } /* ControlFlow */
+code > span.op { color: #f0efd0; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code > span.at { } /* Attribute */
+code > span.do { color: #7f9f7f; } /* Documentation */
+code > span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code > span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/night.css" id="theme">
+  <link rel="stylesheet" href="custom.css"/>
+  <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+  <script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = 'reveal.js/css/print/pdf.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">l7Parsing7:Bencodee</h1>
+    <h2 class="author">Ivan Lazar Miljenovic</h2>
+    <h3 class="date">22 July, 2015</h3>
+</section>
+
+<section><section id="about-this-talk" class="titleslide slide level1"><h1>About this talk</h1></section><section id="who-is-this-guy" class="slide level2" data-background="images/huh.jpg" data-background-color="lightblue">
+<h1>Who is this guy?</h1>
+<aside class="notes">
+<ul>
+<li>Using Haskell since late 2007</li>
+<li>Maintainer of various libraries, primarily graph related</li>
+<li>Writing my own parser</li>
+<li>Name very Google-able</li>
+</ul>
+</aside>
+</section><section id="whats-going-to-be-covered" class="slide level2">
+<h1>What’s going to be covered?</h1>
+<ul>
+<li class="fragment">Write a simple parser</li>
+<li class="fragment">Define data types</li>
+<li class="fragment">Encounter the dreaded “M”-word</li>
+<li class="fragment">Survive doing so</li>
+</ul>
+</section><section id="want-to-skip-ahead" class="slide level2">
+<h1>Want to skip ahead?</h1>
+<dl>
+<dt>Slides</dt>
+<dd><a href="http://ivan-m.github.io/CanFP-Parsing/" class="uri">http://ivan-m.github.io/CanFP-Parsing/</a>
+</dd>
+</dl>
+</section></section>
+<section><section id="why-parser-combinators" class="titleslide slide level1"><h1>Why Parser Combinators?</h1></section><section id="consider-a-common-alternative" class="slide level2">
+<h1>Consider a common alternative…</h1>
+<aside class="notes">
+<ul>
+<li>LCA 2013, Programming Miniconf</li>
+<li>“Solving Interesting Problems by Writing Parsers” by Jacinta Richardson</li>
+<li>Videos available</li>
+<li>Perl-focussed</li>
+<li>So it should be no surprise when she decided to use…</li>
+</ul>
+</aside>
+</section><section id="regex-horror" class="slide level2" data-background="images/horror.jpg" data-background-color="lightblue">
+<h1></h1>
+<blockquote>
+<p><strong>Every time you mention regular expressions, someone brings up Jamie Zawinski.</strong></p>
+</blockquote>
+<div class="fragment">
+<blockquote>
+<p><strong>Now you have two problems.</strong></p>
+</blockquote>
+<aside class="notes">
+<ul>
+<li>She even admits regexes are often the wrong solution.</li>
+<li>Haskellers like Erik de Castro Lopo were watching</li>
+</ul>
+</aside>
+</div>
+</section><section id="why-not-regexes" class="slide level2">
+<h1>Why not regexes?</h1>
+<ul>
+<li class="fragment">Stringly-typed</li>
+<li class="fragment">Not re-usable</li>
+<li class="fragment">Difficult to read</li>
+<li class="fragment">Re-interpreted by compiler</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Embeddable regexes, quasiquotes, etc.</li>
+</ul>
+</aside>
+</section><section id="compare-the-pair" class="slide level2">
+<h1>Compare the pair</h1>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Regular Expressions</th>
+<th style="text-align: left;">Parser Combinators</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="st">&quot;\.\([[:alpha:]][[:alnum:]-_:\.]*\)&quot;</span></code></pre></div></td>
+<td style="text-align: left;"><div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">identifierAttr <span class="fu">=</span> <span class="kw">do</span>
+  char <span class="ch">&#39;.&#39;</span>
+  first <span class="ot">&lt;-</span> letter
+  rest <span class="ot">&lt;-</span> many <span class="fu">$</span> alphaNum
+                 <span class="fu">&lt;|&gt;</span> oneOf <span class="st">&quot;-_:.&quot;</span>
+  return (first<span class="fu">:</span>rest)</code></pre></div></td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<ul>
+<li>Sample taken from Pandoc, identifier in attribute</li>
+<li>regex shorter</li>
+<li>Have I matched all the parens properly?</li>
+<li>combinator version could be shorter</li>
+<li>Which is more readable? combinable?</li>
+<li>regexes more convenient for custom munging</li>
+<li>I forgot the <code>char '.'</code>; which is it easier to spot in?</li>
+</ul>
+</aside>
+</section><section id="what-about-parser-generators" class="slide level2">
+<h1>What about Parser Generators?</h1>
+<aside class="notes">
+<ul>
+<li>Requires a grammar</li>
+<li>Probably faster</li>
+<li>Can emulate in a parser combinator</li>
+<li>Not embeddable in code</li>
+</ul>
+</aside>
+</section></section>
+<section><section id="bencode" class="titleslide slide level1"><h1>Bencode</h1></section></section>
+<section><section id="what-is-bencode" class="titleslide slide level1"><h1>What is Bencode?</h1></section></section>
+<section><section id="defining-the-parser" class="titleslide slide level1"><h1>Defining the Parser</h1></section></section>
+    </div>
+  </div>
+
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,         // Display controls in the bottom right corner
+        progress: true,         // Display a presentation progress bar
+        history: true,          // Push each slide change to the browser history
+        zoomKey: 'shift',
+        center: true,                       // Vertical centering of slides
+        maxScale: 1.5,                  // Bounds for smallest/largest possible content scale
+        slideNumber: false,                // Display the page number of the current slide
+        theme: 'night', // available themes are in /css/theme
+        transition: 'concave', // default/cube/page/concave/zoom/linear/fade/none
+        backgroundTransition: 'zoom', // default/none/fade/slide/convex/concave/zoom
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+//          { src: 'reveal.js/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; }, }
+//          { src: 'reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+]});
+    </script>
+    </body>
+</html>
