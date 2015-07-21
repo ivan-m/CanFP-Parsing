@@ -122,7 +122,46 @@ Notes
 Bencode
 =======
 
-# What is Bencode?
+## What is Bencode?
+
+> * Encoding used by BitTorrent for storing/transmitting data
+> * Comprised of four different types of values:
+
+. . .
+
+Type                Example
+------------  --------------------------
+Integers              `i42e`
+Strings              `4:spam`
+Lists             `l4:spami42ee`
+Dictionaries   `d3:bar4:spam3:fooi42ee`
+
+
+Notes
+:   * Suggested by Mats H
+    * Dictionaries require keys to be strings
+
+## Simplifications
+
+* Use normal strings, not byte strings
+* No validation checks (e.g. allow `-0`)
+* Ignore dictionary ordering
+
+Notes
+:   * Strings should be a sequence of bytes
+    * Dictionaries should be lexicographically ordered by keys
+
+## Datatypes are Awesome! {data-background="images/awesome.jpg" data-background-color="lightblue"}
+
+. . .
+
+~~~haskell
+data Bencode = BInt Int
+             | BString String
+             | BList [Bencode]
+             | BDict [(String, Bencode)]
+             deriving (Show)
+~~~
 
 Defining the Parser
 ===================
