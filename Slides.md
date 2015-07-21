@@ -284,10 +284,14 @@ satisfy p = P $ \str ->
     c:str' | p c       -> (OK c, str')
            | otherwise -> (Err "not satisfied", str)
     _                  -> (Err "empty", str)
+
+-- For example: parse the specified character.
+char :: Char -> Parser Char
+char c = satisfy (c==)
 ~~~
 
 Notes
-:   * When parsing an integer, we want `isDigit`
+:   * When parsing an integer, we want `isDigit` (see later)
     * This looks an awful lot like `next`
     * Idea: call next, get the result, then act on it.
 
@@ -364,7 +368,6 @@ mapF      :: (a -> b) -> f      a  -> f      b
 
 ## That's Func-tastic!
 
-
 ~~~haskell
 class Functor f where
   fmap :: (a -> b) -> f a -> f b
@@ -377,6 +380,247 @@ With the handy in-fix alias of `<$>`.
 
 Notes
 :   * `<$>` vs `$`
+    * Functor laws
+
+## Discarding
+
+Imagine these combinators:
+
+~~~haskell
+discLeft :: Parser a -> Parser b -> Parser b
+
+discRight :: Parser a -> Parser b -> Parser a
+
+-- Run a parser on either side of the one specified.
+bracket :: Parser bra -> Parser ket -> Parser a -> Parser a
+bracket pb pk pa = pb `discLeft` (pa `discRight` pk)
+
+parseBInt :: Parser Bencode
+parseBInt = BInt <$> bracket (char 'i') (char 'e') parseInt
+~~~
+
+Notes
+:   * The discard functions can be obtained by lifting `const` and
+      `flip const` up into the `Parser`.
+
+## Applying lifted functions
+
+~~~haskell
+applyFunc :: Parser (a -> b) -> Parser a -> Parser b
+applyFunc pf pa = pf `inject`
+                      (\f -> pa `inject`
+                                (\a -> toParser (f a)))
+
+discLeft :: Parser a -> Parser b -> Parser b
+discLeft pa pb = (flip const <$> pa) `applyFunc` pb
+
+discRight :: Parser a -> Parser b -> Parser a
+discRight pa pb = (const <$> pa) `applyFunc` pb
+~~~
+
+Notes
+:   * This would look neater if I set up the proper fixities (less
+      parens)
+    * But this way it's more obvious
+
+## Introducing Applicative!
+
+~~~haskell
+class Functor f => Applicative f where
+    -- Lift a value.
+    pure :: a -> f a
+
+    -- Sequential application.
+    (<*>) :: f (a -> b) -> f a -> f b
+
+instance Applicative Parser where
+  pure = toParser
+  (<*>) = applyFunc
+
+bracket :: Parser bra -> Parser ket -> Parser a -> Parser a
+bracket pb pk pa = pb *> pa <* pk
+~~~
+
+Notes
+:   * `*>` and `<*` pre-defined, along with other combinators
+    * `parseBInt` doesn't change
+
+## We still need to get the digits
+
+> 1. Try our parser `p`.
+> 2. If it fails, no values, so return an empty list `[]`.
+> 3. Otherwise, recurse and put this value on the front of the list.
+
+Notes
+:   * We want to get a list of values
+    * We can handle putting the value on front with Applicative
+
+## Handling backtracking
+
+> 1. `try`-based semantics
+> 2. `commit`-based semantics
+> 3. "Just do it already"-based semantics
+
+Notes
+:   * Three differeint ways of handling backtracking
+    * Forget the `try`? No backtracking
+    * Forget the `commit`? Still works, just less performance and
+      worse errors (*"Partial Parsing: combining choice with
+      commitment"* by Malcolm Wallace)
+    * Doing it, as epitomised by `attoparsec`.
+
+## Failing gracefully
+
+~~~haskell
+-- If the first parser fails, try the second.
+onFail :: Parser a -> Parser a -> Parser a
+onFail p1 p2 = P $ \str -> case runP p1 str of
+                             (Err _, _) -> runP p2 str
+                             ok         -> ok
+~~~
+
+## Trust me, there's a class for it
+
+~~~haskell
+class Applicative f => Alternative f where
+    -- The identity of '<|>'
+    empty :: f a
+    -- An associative binary operation
+    (<|>) :: f a -> f a -> f a
+
+instance Alternative Parser where
+  empty = failParser "empty value"
+  (<|>) = onFail
+
+-- Try to parse one of the provided parsers in sequence.
+oneOf :: [Parser a] -> Parser a
+oneOf []     = fail "No parsers remaining"
+oneOf (p:ps) = p <|> oneOf ps
+~~~
+
+Notes
+:   * This class comes from parser libraries
+    * Parsec still (?) uses it's own `<|>`.
+    * Comes with `many` and `some` (which I called `atLeastOnce`).
+
+## Finally, we have Integers!
+
+~~~haskell
+parseInt :: Parse Int
+parseInt = read <$> some (satisfy isDigit)
+
+parseBInt :: Parser Bencode
+parseBInt = BInt <$> bracket (char 'i') (char 'e') parseInt
+~~~
+
+## Time for Strings
+
+> 1. Parse a (non-negative) integer `n`
+> 2. Parse a `:`
+> 3. Return the next `n` characters
+
+. . .
+
+
+~~~haskell
+parseString :: Parser String
+parseString = parseInt
+              `inject`
+              (\n -> char ':' *> exactly n next)
+
+-- Run the parser the specified number of times.
+exactly :: Int -> Parser a -> Parser [a]
+exactly n p
+  | n <= 0    = pure []
+  | otherwise = liftA2 (:) p (exactly (n-1) p)
+~~~
+
+## I wish there was a nicer syntax for inject...
+
+. . .
+
+> But there is!
+
+## Warm Fuzzy Things
+
+> * aka _Workflows_
+> * ~~aka _Burritos_~~
+> * aka "a monoid in the category of endofunctors"
+> * aka <span style="font-variant:small-caps;">_Monads_</span>
+
+Notes
+:   * Workflows are from F#
+    * SPJ: Our biggest mistake: Using the scary term "monad" rather than
+      "warm fuzzy thing" (Wearing the hair shirt: a retrospective on
+      Haskell (2003))
+    * "monoid" from "A Brief, Incomplete, and Mostly Wrong History of
+      Programming Languages" by James Iry (supposedly Philip Wadler)
+    * Burritos from: Abstraction, intuition, and the “monad tutorial
+      fallacy” by Brent Yorgey
+
+## The "M" word
+
+~~~haskell
+class Applicative m => Monad m where
+    -- Usually called "bind"
+    (>>=) :: m a -> (a -> m b) -> m b
+    (>>) :: m a -> m b -> m b
+    return :: a -> m a
+    fail :: String -> m a
+
+instance Monad Parser where
+  (>>=) = inject
+  (>>) = (*>)
+  return = pure
+  fail = failParser
+~~~
+
+Notes
+:   * `Applicative` constraint as of GHC 7.10 (AMP)
+    * `return` and `(*>)` have these by default.
+    * `fail` is considered a wart; used for pattern matching failures
+    * Replace `fail` with a new class (e.g. `MonadPlus`)?
+    * Parsers possibly only semi-valid use of `fail`.
+
+## Strings again
+
+~~~haskell
+parseString :: Parser String
+parseString = do n <- parseInt
+                 char ':'
+                 exactly n next
+
+parseBString :: Parser Bencode
+parseBString = BString <$> parseString
+~~~
+
+Notes
+:   * Sequential-style operations!
+    * "In short, Haskell is the world’s finest imperative programming
+      language." (SPJ, "Tackling the Awkward Squad")
+    * `a <- m; ...` equivalent to `m >>= (\a -> ...)`
+    * `m1; m2` equivalent to `m1 >> m2`
+
+## Finishing it off
+
+~~~haskell
+parseBList :: Parser Bencode
+parseBList = BList <$> bracket (char 'l') (char 'e')
+                               (many parseBencode)
+
+parseBDict :: Parser Bencode
+parseBDict = BDict <$> bracket (char 'd') (char 'e') (many parseKV)
+  where
+    parseKV = liftA2 (,) parseString parseBencode
+
+parseBencode :: Parser Bencode
+parseBencode = oneOf [ parseBInt, parseBString
+                     , parseBList, parseBDict
+                     ]
+~~~
+
+Notes
+:   * Mutual recursion is fun!
 
 ---
 # License links
