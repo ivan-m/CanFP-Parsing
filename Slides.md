@@ -28,6 +28,9 @@ Notes
 Slides
 :   <http://ivan-m.github.io/CanFP-Parsing/>
 
+Source Code
+:   <https://github.com/ivan-m/CanFP-Parsing/tree/master/src>
+
 Why Parser Combinators?
 =======================
 
