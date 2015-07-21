@@ -200,6 +200,7 @@ Notes
 Notes
 :   * I first need to get the first char to get `i`
     * Now what?
+    * The input is all used up!
 
 ## Attempt 2
 
@@ -210,6 +211,7 @@ type Parser a = String -> (a, String)
 Notes
 :   * Returns un-consumed input
     * What happens if it _isn't_ an integer?
+    * This says it always returns a value!
 
 ## Attempt 3
 
@@ -245,6 +247,7 @@ newtype State s a = St { runState :: s -> (a, s) }
 Notes
 :   * Don't export constructor
     * `runP` runs the parser
+    * `newtype` is run-time isomorphic to original
     * Specialised version of State Monad
 
 Let's start parsing!
