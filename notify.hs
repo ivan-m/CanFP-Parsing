@@ -13,6 +13,8 @@
  -}
 module Main where
 
+import Control.Arrow    (first)
+import Data.List        (partition)
 import Text.Pandoc.JSON
 
 -- -----------------------------------------------------------------------------
@@ -23,11 +25,26 @@ main = toJSONFilter notify
 -- -----------------------------------------------------------------------------
 
 notify :: Maybe Format -> Block -> [Block]
-notify mfmt (DefinitionList [([Str "Notes"], nts)])
-  = case mfmt of
-      Just "revealjs" -> RawBlock (Format "html") "<aside class=\"notes\">"
-                         : concat nts
-                         ++ [RawBlock (Format "html") "</aside>"]
-      Just "dzslides" -> [Div ("",[],[("role","note")]) (concat nts)]
-      _               -> []
+notify mfmt dl@(DefinitionList dfs)
+  = case getNotes dfs of
+      ([],_)      -> [dl]
+      (nts, dfs') -> let dl' = DefinitionList dfs'
+                     in case mfmt of
+                          Just "revealjs" -> RawBlock (Format "html") "<aside class=\"notes\">"
+                                             : nts
+                                             ++ [ RawBlock (Format "html") "</aside>"
+                                                , dl'
+                                                ]
+                          Just "dzslides" -> [Div ("",[],[("role","note")]) nts, dl']
+                          _               -> [dl']
 notify _ bl = [bl]
+
+type DefList = [([Inline], [[Block]])]
+
+getNotes :: DefList -> ([Block], DefList)
+getNotes = first merge . partition isNote
+  where
+    isNote ([Str "Notes"],_) = True
+    isNote _                 = False
+
+    merge = concat . concatMap snd
