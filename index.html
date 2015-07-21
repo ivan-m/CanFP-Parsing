@@ -74,7 +74,9 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
     <h3 class="date">22 July, 2015</h3>
 </section>
 
-<section><section id="about-this-talk" class="titleslide slide level1"><h1>About this talk</h1></section><section id="who-is-this-guy" class="slide level2" data-background="images/huh.jpg" data-background-color="lightblue">
+<section><section id="about-this-talk" class="titleslide slide level1"><h1>About this talk</h1></section><section id="feel-free-to-yell-out" class="slide level2">
+<h1>Feel free to yell out!</h1>
+</section><section id="who-is-this-guy" class="slide level2" data-background="images/huh.jpg" data-background-color="lightblue">
 <h1>Who is this guy?</h1>
 <aside class="notes">
 <ul>
@@ -84,6 +86,8 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <li>Name very Google-able</li>
 </ul>
 </aside>
+<dl>
+</dl>
 </section><section id="whats-going-to-be-covered" class="slide level2">
 <h1>What’s going to be covered?</h1>
 <ul>
@@ -97,6 +101,8 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <dl>
 <dt>Slides</dt>
 <dd><a href="http://ivan-m.github.io/CanFP-Parsing/" class="uri">http://ivan-m.github.io/CanFP-Parsing/</a>
+</dd>
+<dd>(Hint: press <code>s</code> to see my secret notes!)
 </dd>
 <dt>Source Code</dt>
 <dd><a href="https://github.com/ivan-m/CanFP-Parsing/tree/master/src" class="uri">https://github.com/ivan-m/CanFP-Parsing/tree/master/src</a>
@@ -114,6 +120,8 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <li>So it should be no surprise when she decided to use…</li>
 </ul>
 </aside>
+<dl>
+</dl>
 </section><section id="regex-horror" class="slide level2" data-background="images/horror.jpg" data-background-color="lightblue">
 <h1></h1>
 <blockquote>
@@ -129,6 +137,8 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <li>Haskellers like Erik de Castro Lopo were watching</li>
 </ul>
 </aside>
+<dl>
+</dl>
 </div>
 </section><section id="why-not-regexes" class="slide level2">
 <h1>Why not regexes?</h1>
@@ -143,31 +153,10 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <li>Embeddable regexes, quasiquotes, etc.</li>
 </ul>
 </aside>
+<dl>
+</dl>
 </section><section id="compare-the-pair" class="slide level2">
 <h1>Compare the pair</h1>
-<table>
-<colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Regular Expressions</th>
-<th style="text-align: left;">Parser Combinators</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="st">&quot;\.\([[:alpha:]][[:alnum:]-_:\.]*\)&quot;</span></code></pre></div></td>
-<td style="text-align: left;"><div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">identifierAttr <span class="fu">=</span> <span class="kw">do</span>
-  char <span class="ch">&#39;.&#39;</span>
-  first <span class="ot">&lt;-</span> letter
-  rest <span class="ot">&lt;-</span> many <span class="fu">$</span> alphaNum
-                 <span class="fu">&lt;|&gt;</span> oneOf <span class="st">&quot;-_:.&quot;</span>
-  return (first<span class="fu">:</span>rest)</code></pre></div></td>
-</tr>
-</tbody>
-</table>
 <aside class="notes">
 <ul>
 <li>Sample taken from Pandoc, identifier in attribute</li>
@@ -179,20 +168,190 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <li>I forgot the <code>char '.'</code>; which is it easier to spot in?</li>
 </ul>
 </aside>
+<dl>
+<dt>Regular Expressions</dt>
+<dd><div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="st">&quot;\.\([[:alpha:]][[:alnum:]-_:\.]*\)&quot;</span></code></pre></div>
+</dd>
+<dt>Parser Combinators</dt>
+<dd><div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">identifierAttr <span class="fu">=</span> <span class="kw">do</span>
+  char <span class="ch">&#39;.&#39;</span>
+  first <span class="ot">&lt;-</span> letter
+  rest <span class="ot">&lt;-</span> many <span class="fu">$</span> alphaNum
+                 <span class="fu">&lt;|&gt;</span> oneOf <span class="st">&quot;-_:.&quot;</span>
+  return (first<span class="fu">:</span>rest)</code></pre></div>
+</dd>
+</dl>
 </section><section id="what-about-parser-generators" class="slide level2">
 <h1>What about Parser Generators?</h1>
 <aside class="notes">
 <ul>
-<li>Requires a grammar</li>
+<li><em>Requires</em> a grammar</li>
+<li>Combinators easier to extend</li>
 <li>Probably faster</li>
 <li>Can emulate in a parser combinator</li>
 <li>Not embeddable in code</li>
+<li>Usually needs an external tool</li>
 </ul>
 </aside>
+<dl>
+</dl>
+</section><section id="availability-of-parser-combinators" class="slide level2">
+<h1>Availability of parser combinators</h1>
+<ul>
+<li>Most (all?) FP languages</li>
+<li>Javascript</li>
+<li>R</li>
+<li>Java</li>
+<li>C#</li>
+<li>etc.</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Multiple implementations (parsec, attoparsec, polyparse, trifecta, etc.)</li>
+<li>Rite of passage!</li>
+<li>If Java has it, <em>of course</em> C# has to have it to prove they’re better…</li>
+</ul>
+</aside>
+<dl>
+</dl>
 </section></section>
-<section><section id="bencode" class="titleslide slide level1"><h1>Bencode</h1></section></section>
-<section><section id="what-is-bencode" class="titleslide slide level1"><h1>What is Bencode?</h1></section></section>
-<section><section id="defining-the-parser" class="titleslide slide level1"><h1>Defining the Parser</h1></section></section>
+<section><section id="bencode" class="titleslide slide level1"><h1>Bencode</h1></section><section id="what-is-bencode" class="slide level2">
+<h1>What is Bencode?</h1>
+<ul>
+<li class="fragment">Encoding used by BitTorrent for storing/transmitting data</li>
+<li class="fragment">Comprised of four different types of values:</li>
+</ul>
+<div class="fragment">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Type</th>
+<th style="text-align: center;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Integers</td>
+<td style="text-align: center;"><code>i42e</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Strings</td>
+<td style="text-align: center;"><code>4:spam</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Lists</td>
+<td style="text-align: center;"><code>l4:spami42ee</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dictionaries</td>
+<td style="text-align: center;"><code>d3:bar4:spam3:fooi42ee</code></td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<ul>
+<li>Suggested by Mats H</li>
+<li>Dictionaries require keys to be strings</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</div>
+</section><section id="simplifications" class="slide level2">
+<h1>Simplifications</h1>
+<ul>
+<li>Use normal strings, not byte strings</li>
+<li>No validation checks (e.g. allow <code>-0</code>)</li>
+<li>Ignore dictionary ordering</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Strings should be a sequence of bytes</li>
+<li>Dictionaries should be lexicographically ordered by keys</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="datatypes-are-awesome" class="slide level2" data-background="images/awesome.jpg" data-background-color="lightblue">
+<h1>Datatypes are Awesome!</h1>
+<div class="fragment">
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Bencode</span> <span class="fu">=</span> <span class="dt">BInt</span> <span class="dt">Int</span>
+             <span class="fu">|</span> <span class="dt">BString</span> <span class="dt">String</span>
+             <span class="fu">|</span> <span class="dt">BList</span> [<span class="dt">Bencode</span>]
+             <span class="fu">|</span> <span class="dt">BDict</span> [(<span class="dt">String</span>, <span class="dt">Bencode</span>)]
+             <span class="kw">deriving</span> (<span class="dt">Show</span>)</code></pre></div>
+</div>
+</section></section>
+<section><section id="defining-the-parser" class="titleslide slide level1"><h1>Defining the Parser</h1></section><section id="what-is-a-parser" class="slide level2">
+<h1>What is a parser?</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">Parser</span> a <span class="fu">=</span> <span class="dt">String</span> <span class="ot">-&gt;</span> a</code></pre></div>
+<aside class="notes">
+<ul>
+<li>Most basic definition of what a parser is</li>
+<li>Is that it?</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="consider-parsing-an-integer" class="slide level2">
+<h1>Consider parsing an integer</h1>
+<ul>
+<li class="fragment">Let’s parse <code>i42e</code></li>
+<li class="fragment">Imagine a function <code>next :: Parser Char</code></li>
+</ul>
+<aside class="notes">
+<ul>
+<li>I first need to get the first char to get <code>i</code></li>
+<li>Now what?</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="attempt-2" class="slide level2">
+<h1>Attempt 2</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">type</span> <span class="dt">Parser</span> a <span class="fu">=</span> <span class="dt">String</span> <span class="ot">-&gt;</span> (a, <span class="dt">String</span>)</code></pre></div>
+<aside class="notes">
+<ul>
+<li>Returns un-consumed input</li>
+<li>What happens if it <em>isn’t</em> an integer?</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="attempt-3" class="slide level2">
+<h1>Attempt 3</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- The result of a parser: either an error or the expected result.</span>
+<span class="kw">data</span> <span class="dt">Result</span> a <span class="fu">=</span> <span class="dt">Err</span> <span class="dt">String</span>
+              <span class="fu">|</span> <span class="dt">OK</span> a
+              <span class="kw">deriving</span> (<span class="dt">Show</span>)
+
+<span class="kw">type</span> <span class="dt">Parser</span> a <span class="fu">=</span> <span class="dt">String</span> <span class="ot">-&gt;</span> (<span class="dt">Result</span> a, <span class="dt">String</span>)</code></pre></div>
+<aside class="notes">
+<ul>
+<li>Up to isomorphism of how result is returned</li>
+<li>Complete in terms of being able to work</li>
+<li>Can be bypassed</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="final-definition" class="slide level2">
+<h1>Final definition</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">newtype</span> <span class="dt">Parser</span> a <span class="fu">=</span> <span class="dt">P</span> {<span class="ot"> runP ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> (<span class="dt">Result</span> a, <span class="dt">String</span>) }</code></pre></div>
+<div class="fragment">
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Shhhhhh!!!!!</span>
+<span class="kw">newtype</span> <span class="dt">State</span> s a <span class="fu">=</span> <span class="dt">St</span> {<span class="ot"> runState ::</span> s <span class="ot">-&gt;</span> (a, s) }</code></pre></div>
+<aside class="notes">
+<ul>
+<li>Don’t export constructor</li>
+<li><code>runP</code> runs the parser</li>
+<li>Specialised version of State Monad</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</div>
+</section></section>
     </div>
   </div>
 
