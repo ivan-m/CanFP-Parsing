@@ -1,0 +1,15 @@
+.reveal h1 { font-size: 3em; }
+
+.slides section.has-light-background,
+.slides section.has-light-background h1 {
+    color: FireBrick;
+}
+
+
+.reveal pre {
+    width: 100%;
+    /*
+    font-size: 0.4em;
+    margin: 10px auto;
+   */
+}
