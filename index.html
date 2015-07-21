@@ -74,10 +74,12 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
     <h3 class="date">22 July, 2015</h3>
 </section>
 
-<section><section id="about-this-talk" class="titleslide slide level1"><h1>About this talk</h1></section><section id="feel-free-to-yell-out" class="slide level2">
+<section><section id="about-this-talk" class="titleslide slide level1"><h1>About this talk</h1></section><section id="feel-free-to-yell-out" class="slide level2" data-background="images/yell.jpg" data-background-color="white">
 <h1>Feel free to yell out!</h1>
+<h6 id="picture-by-oliver-tacke-cc-by"><a href="https://www.flickr.com/photos/otacke/12635014673">Picture</a> by Oliver Tacke / <a href="https://creativecommons.org/licenses/by/2.0/">CC BY</a></h6>
 </section><section id="who-is-this-guy" class="slide level2" data-background="images/huh.jpg" data-background-color="lightblue">
 <h1>Who is this guy?</h1>
+<h6 id="picture-by-elio-m.-cc-by-nc"><a href="https://www.flickr.com/photos/jumpn_around/2239989214/">Picture</a> by elio m. / <a href="https://creativecommons.org/licenses/by-nc/2.0/">CC BY-NC</a></h6>
 <aside class="notes">
 <ul>
 <li>Using Haskell since late 2007</li>
@@ -131,6 +133,7 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <blockquote>
 <p><strong>Now you have two problems.</strong></p>
 </blockquote>
+<h6 id="picture-by-jeremy-brooks-cc-by-nc"><a href="https://www.flickr.com/photos/jeremybrooks/2199355153/">Picture</a> by Jeremy Brooks / <a href="https://creativecommons.org/licenses/by-nc/2.0/">CC BY-NC</a></h6>
 <aside class="notes">
 <ul>
 <li>She even admits regexes are often the wrong solution.</li>
@@ -205,6 +208,10 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <li>C#</li>
 <li>etc.</li>
 </ul>
+<div class="fragment">
+<blockquote>
+<p><strong>Not just for data!</strong></p>
+</blockquote>
 <aside class="notes">
 <ul>
 <li>Multiple implementations (parsec, attoparsec, polyparse, trifecta, etc.)</li>
@@ -214,6 +221,7 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 </aside>
 <dl>
 </dl>
+</div>
 </section></section>
 <section><section id="bencode" class="titleslide slide level1"><h1>Bencode</h1></section><section id="what-is-bencode" class="slide level2">
 <h1>What is Bencode?</h1>
@@ -280,6 +288,7 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
              <span class="fu">|</span> <span class="dt">BList</span> [<span class="dt">Bencode</span>]
              <span class="fu">|</span> <span class="dt">BDict</span> [(<span class="dt">String</span>, <span class="dt">Bencode</span>)]
              <span class="kw">deriving</span> (<span class="dt">Show</span>)</code></pre></div>
+<h6 id="picture-by-crises_crs-cc-by-nc"><a href="https://www.flickr.com/photos/33774513@N08/3153440876/">Picture</a> by crises_crs / <a href="https://creativecommons.org/licenses/by-nc/2.0/">CC BY-NC</a></h6>
 </div>
 </section></section>
 <section><section id="defining-the-parser" class="titleslide slide level1"><h1>Defining the Parser</h1></section><section id="what-is-a-parser" class="slide level2">
@@ -351,6 +360,16 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <dl>
 </dl>
 </div>
+</section></section>
+<section><section id="lets-start-parsing" class="titleslide slide level1"><h1>Let’s start parsing!</h1></section><section id="create-basic-parsers" class="slide level2">
+<h1>Create basic parsers</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- Lift a value into a parser.</span>
+<span class="ot">toParser ::</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a
+toParser a <span class="fu">=</span> <span class="dt">P</span> <span class="fu">$</span> \str <span class="ot">-&gt;</span> (<span class="dt">OK</span> a, str)
+
+<span class="co">-- Throw a parser error.</span>
+<span class="ot">failParser ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> a
+failParser err <span class="fu">=</span> <span class="dt">P</span> <span class="fu">$</span> \str <span class="ot">-&gt;</span> (<span class="dt">Err</span> err, str)</code></pre></div>
 </section></section>
     </div>
   </div>
