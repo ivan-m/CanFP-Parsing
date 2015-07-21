@@ -8,6 +8,8 @@ date: 22 July, 2015
 About this talk
 ===============
 
+## Feel free to yell out!
+
 ## Who is this guy? {data-background="images/huh.jpg" data-background-color="lightblue"}
 
 Notes
@@ -27,6 +29,7 @@ Notes
 
 Slides
 :   <http://ivan-m.github.io/CanFP-Parsing/>
+:   (Hint: press `s` to see my secret notes!)
 
 Source Code
 :   <https://github.com/ivan-m/CanFP-Parsing/tree/master/src>
