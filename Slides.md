@@ -10,7 +10,11 @@ About this talk
 
 ## Feel free to yell out! {data-background="images/yell.jpg" data-background-color="white"}
 
+###### [Picture](https://www.flickr.com/photos/otacke/12635014673) by Oliver Tacke / [CC BY]
+
 ## Who is this guy? {data-background="images/huh.jpg" data-background-color="lightblue"}
+
+###### [Picture](https://www.flickr.com/photos/jumpn_around/2239989214/) by elio m. / [CC BY-NC]
 
 Notes
 :   * Using Haskell since late 2007
@@ -55,6 +59,8 @@ Notes
 . . .
 
 > **Now you have two problems.**
+
+###### [Picture](https://www.flickr.com/photos/jeremybrooks/2199355153/) by Jeremy Brooks / [CC BY-NC]
 
 Notes
 :   * She even admits regexes are often the wrong solution.
@@ -170,6 +176,8 @@ data Bencode = BInt Int
              deriving (Show)
 ~~~
 
+###### [Picture](https://www.flickr.com/photos/33774513@N08/3153440876/) by crises_crs / [CC BY-NC]
+
 Defining the Parser
 ===================
 
@@ -253,6 +261,14 @@ toParser a = P $ \str -> (OK a, str)
 failParser :: String -> Parser a
 failParser err = P $ \str -> (Err err, str)
 ~~~
+
+
+---
+# License links
+...
+
+[CC BY]: https://creativecommons.org/licenses/by/2.0/
+[CC BY-NC]: https://creativecommons.org/licenses/by-nc/2.0/
 
 ---
 # reveal.js settings
