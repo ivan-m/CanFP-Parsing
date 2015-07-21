@@ -115,6 +115,10 @@ Notes
 * C#
 * etc.
 
+. . .
+
+> **Not just for data!**
+
 Notes
 :   * Multiple implementations (parsec, attoparsec, polyparse,
       trifecta, etc.)
