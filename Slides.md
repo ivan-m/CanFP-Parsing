@@ -69,18 +69,20 @@ Notes
 
 ## Compare the pair
 
-+------------------------------------+-----------------------------------+
-|Regular Expressions                 |Parser Combinators                 |
-+====================================+===================================+
-|```haskell                          |```haskell                         |
-|"\.\([[:alpha:]][[:alnum:]-_:\.]*\)"|identifierAttr = do                |
-|```                                 |  char '.'                         |
-|                                    |  first <- letter                  |
-|                                    |  rest <- many $ alphaNum          |
-|                                    |                 <|> oneOf "-_:."  |
-|                                    |  return (first:rest)              |
-|                                    |```                                |
-+------------------------------------+-----------------------------------+
+Regular Expressions
+:   ```haskell
+    "\.\([[:alpha:]][[:alnum:]-_:\.]*\)"
+    ```
+
+Parser Combinators
+:   ```haskell
+    identifierAttr = do
+      char '.'
+      first <- letter
+      rest <- many $ alphaNum
+                     <|> oneOf "-_:."
+      return (first:rest)
+    ```
 
 Notes
 :   * Sample taken from Pandoc, identifier in attribute
