@@ -387,10 +387,14 @@ satisfy p <span class="fu">=</span> <span class="dt">P</span> <span class="fu">$
   <span class="kw">case</span> str <span class="kw">of</span>
     c<span class="fu">:</span>str&#39; <span class="fu">|</span> p c       <span class="ot">-&gt;</span> (<span class="dt">OK</span> c, str&#39;)
            <span class="fu">|</span> otherwise <span class="ot">-&gt;</span> (<span class="dt">Err</span> <span class="st">&quot;not satisfied&quot;</span>, str)
-    _                  <span class="ot">-&gt;</span> (<span class="dt">Err</span> <span class="st">&quot;empty&quot;</span>, str)</code></pre></div>
+    _                  <span class="ot">-&gt;</span> (<span class="dt">Err</span> <span class="st">&quot;empty&quot;</span>, str)
+
+<span class="co">-- For example: parse the specified character.</span>
+<span class="ot">char ::</span> <span class="dt">Char</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> <span class="dt">Char</span>
+char c <span class="fu">=</span> satisfy (c<span class="fu">==</span>)</code></pre></div>
 <aside class="notes">
 <ul>
-<li>When parsing an integer, we want <code>isDigit</code></li>
+<li>When parsing an integer, we want <code>isDigit</code> (see later)</li>
 <li>This looks an awful lot like <code>next</code></li>
 <li>Idea: call next, get the result, then act on it.</li>
 </ul>
@@ -478,6 +482,251 @@ map<span class="ot">       ::</span> (a <span class="ot">-&gt;</span> b) <span c
 <aside class="notes">
 <ul>
 <li><code>&lt;$&gt;</code> vs <code>$</code></li>
+<li>Functor laws</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="discarding" class="slide level2">
+<h1>Discarding</h1>
+<p>Imagine these combinators:</p>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">discLeft ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> b <span class="ot">-&gt;</span> <span class="dt">Parser</span> b
+
+<span class="ot">discRight ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> b <span class="ot">-&gt;</span> <span class="dt">Parser</span> a
+
+<span class="co">-- Run a parser on either side of the one specified.</span>
+<span class="ot">bracket ::</span> <span class="dt">Parser</span> bra <span class="ot">-&gt;</span> <span class="dt">Parser</span> ket <span class="ot">-&gt;</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a
+bracket pb pk pa <span class="fu">=</span> pb <span class="ot">`discLeft`</span> (pa <span class="ot">`discRight`</span> pk)
+
+<span class="ot">parseBInt ::</span> <span class="dt">Parser</span> <span class="dt">Bencode</span>
+parseBInt <span class="fu">=</span> <span class="dt">BInt</span> <span class="fu">&lt;$&gt;</span> bracket (char <span class="ch">&#39;i&#39;</span>) (char <span class="ch">&#39;e&#39;</span>) parseInt</code></pre></div>
+<aside class="notes">
+<ul>
+<li>The discard functions can be obtained by lifting <code>const</code> and <code>flip const</code> up into the <code>Parser</code>.</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="applying-lifted-functions" class="slide level2">
+<h1>Applying lifted functions</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">applyFunc ::</span> <span class="dt">Parser</span> (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> b
+applyFunc pf pa <span class="fu">=</span> pf <span class="ot">`inject`</span>
+                      (\f <span class="ot">-&gt;</span> pa <span class="ot">`inject`</span>
+                                (\a <span class="ot">-&gt;</span> toParser (f a)))
+
+<span class="ot">discLeft ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> b <span class="ot">-&gt;</span> <span class="dt">Parser</span> b
+discLeft pa pb <span class="fu">=</span> (flip const <span class="fu">&lt;$&gt;</span> pa) <span class="ot">`applyFunc`</span> pb
+
+<span class="ot">discRight ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> b <span class="ot">-&gt;</span> <span class="dt">Parser</span> a
+discRight pa pb <span class="fu">=</span> (const <span class="fu">&lt;$&gt;</span> pa) <span class="ot">`applyFunc`</span> pb</code></pre></div>
+<aside class="notes">
+<ul>
+<li>This would look neater if I set up the proper fixities (less parens)</li>
+<li>But this way it’s more obvious</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="introducing-applicative" class="slide level2">
+<h1>Introducing Applicative!</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Functor</span> f <span class="ot">=&gt;</span> <span class="dt">Applicative</span> f <span class="kw">where</span>
+    <span class="co">-- Lift a value.</span>
+<span class="ot">    pure ::</span> a <span class="ot">-&gt;</span> f a
+
+    <span class="co">-- Sequential application.</span>
+<span class="ot">    (&lt;*&gt;) ::</span> f (a <span class="ot">-&gt;</span> b) <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f b
+
+<span class="kw">instance</span> <span class="dt">Applicative</span> <span class="dt">Parser</span> <span class="kw">where</span>
+  pure <span class="fu">=</span> toParser
+  (<span class="fu">&lt;*&gt;</span>) <span class="fu">=</span> applyFunc
+
+<span class="ot">bracket ::</span> <span class="dt">Parser</span> bra <span class="ot">-&gt;</span> <span class="dt">Parser</span> ket <span class="ot">-&gt;</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a
+bracket pb pk pa <span class="fu">=</span> pb <span class="fu">*&gt;</span> pa <span class="fu">&lt;*</span> pk</code></pre></div>
+<aside class="notes">
+<ul>
+<li><code>*&gt;</code> and <code>&lt;*</code> pre-defined, along with other combinators</li>
+<li><code>parseBInt</code> doesn’t change</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="we-still-need-to-get-the-digits" class="slide level2">
+<h1>We still need to get the digits</h1>
+<ol type="1">
+<li class="fragment">Try our parser <code>p</code>.</li>
+<li class="fragment">If it fails, no values, so return an empty list <code>[]</code>.</li>
+<li class="fragment">Otherwise, recurse and put this value on the front of the list.</li>
+</ol>
+<aside class="notes">
+<ul>
+<li>We want to get a list of values</li>
+<li>We can handle putting the value on front with Applicative</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="handling-backtracking" class="slide level2">
+<h1>Handling backtracking</h1>
+<ol type="1">
+<li class="fragment"><code>try</code>-based semantics</li>
+<li class="fragment"><code>commit</code>-based semantics</li>
+<li class="fragment">“Just do it already”-based semantics</li>
+</ol>
+<aside class="notes">
+<ul>
+<li>Three differeint ways of handling backtracking</li>
+<li>Forget the <code>try</code>? No backtracking</li>
+<li>Forget the <code>commit</code>? Still works, just less performance and worse errors (<em>“Partial Parsing: combining choice with commitment”</em> by Malcolm Wallace)</li>
+<li>Doing it, as epitomised by <code>attoparsec</code>.</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="failing-gracefully" class="slide level2">
+<h1>Failing gracefully</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="co">-- If the first parser fails, try the second.</span>
+<span class="ot">onFail ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> a
+onFail p1 p2 <span class="fu">=</span> <span class="dt">P</span> <span class="fu">$</span> \str <span class="ot">-&gt;</span> <span class="kw">case</span> runP p1 str <span class="kw">of</span>
+                             (<span class="dt">Err</span> _, _) <span class="ot">-&gt;</span> runP p2 str
+                             ok         <span class="ot">-&gt;</span> ok</code></pre></div>
+</section><section id="trust-me-theres-a-class-for-it" class="slide level2">
+<h1>Trust me, there’s a class for it</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Applicative</span> f <span class="ot">=&gt;</span> <span class="dt">Alternative</span> f <span class="kw">where</span>
+    <span class="co">-- The identity of &#39;&lt;|&gt;&#39;</span>
+<span class="ot">    empty ::</span> f a
+    <span class="co">-- An associative binary operation</span>
+<span class="ot">    (&lt;|&gt;) ::</span> f a <span class="ot">-&gt;</span> f a <span class="ot">-&gt;</span> f a
+
+<span class="kw">instance</span> <span class="dt">Alternative</span> <span class="dt">Parser</span> <span class="kw">where</span>
+  empty <span class="fu">=</span> failParser <span class="st">&quot;empty value&quot;</span>
+  (<span class="fu">&lt;|&gt;</span>) <span class="fu">=</span> onFail
+
+<span class="co">-- Try to parse one of the provided parsers in sequence.</span>
+<span class="ot">oneOf ::</span> [<span class="dt">Parser</span> a] <span class="ot">-&gt;</span> <span class="dt">Parser</span> a
+oneOf []     <span class="fu">=</span> fail <span class="st">&quot;No parsers remaining&quot;</span>
+oneOf (p<span class="fu">:</span>ps) <span class="fu">=</span> p <span class="fu">&lt;|&gt;</span> oneOf ps</code></pre></div>
+<aside class="notes">
+<ul>
+<li>This class comes from parser libraries</li>
+<li>Parsec still (?) uses it’s own <code>&lt;|&gt;</code>.</li>
+<li>Comes with <code>many</code> and <code>some</code> (which I called <code>atLeastOnce</code>).</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="finally-we-have-integers" class="slide level2">
+<h1>Finally, we have Integers!</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">parseInt ::</span> <span class="dt">Parse</span> <span class="dt">Int</span>
+parseInt <span class="fu">=</span> read <span class="fu">&lt;$&gt;</span> some (satisfy isDigit)
+
+<span class="ot">parseBInt ::</span> <span class="dt">Parser</span> <span class="dt">Bencode</span>
+parseBInt <span class="fu">=</span> <span class="dt">BInt</span> <span class="fu">&lt;$&gt;</span> bracket (char <span class="ch">&#39;i&#39;</span>) (char <span class="ch">&#39;e&#39;</span>) parseInt</code></pre></div>
+</section><section id="time-for-strings" class="slide level2">
+<h1>Time for Strings</h1>
+<ol type="1">
+<li class="fragment">Parse a (non-negative) integer <code>n</code></li>
+<li class="fragment">Parse a <code>:</code></li>
+<li class="fragment">Return the next <code>n</code> characters</li>
+</ol>
+<div class="fragment">
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">parseString ::</span> <span class="dt">Parser</span> <span class="dt">String</span>
+parseString <span class="fu">=</span> parseInt
+              <span class="ot">`inject`</span>
+              (\n <span class="ot">-&gt;</span> char <span class="ch">&#39;:&#39;</span> <span class="fu">*&gt;</span> exactly n next)
+
+<span class="co">-- Run the parser the specified number of times.</span>
+<span class="ot">exactly ::</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> [a]
+exactly n p
+  <span class="fu">|</span> n <span class="fu">&lt;=</span> <span class="dv">0</span>    <span class="fu">=</span> pure []
+  <span class="fu">|</span> otherwise <span class="fu">=</span> liftA2 (<span class="fu">:</span>) p (exactly (n<span class="fu">-</span><span class="dv">1</span>) p)</code></pre></div>
+</div>
+</section><section id="i-wish-there-was-a-nicer-syntax-for-inject" class="slide level2">
+<h1>I wish there was a nicer syntax for inject…</h1>
+<div class="fragment">
+<blockquote>
+<p>But there is!</p>
+</blockquote>
+</div>
+</section><section id="warm-fuzzy-things" class="slide level2">
+<h1>Warm Fuzzy Things</h1>
+<ul>
+<li class="fragment">aka <em>Workflows</em></li>
+<li class="fragment"><del>aka <em>Burritos</em></del></li>
+<li class="fragment">aka “a monoid in the category of endofunctors”</li>
+<li class="fragment">aka <span style="font-variant: small-caps;"><em>Monads</em></span></li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Workflows are from F#</li>
+<li>SPJ: Our biggest mistake: Using the scary term “monad” rather than “warm fuzzy thing” (Wearing the hair shirt: a retrospective on Haskell (2003))</li>
+<li>“monoid” from “A Brief, Incomplete, and Mostly Wrong History of Programming Languages” by James Iry (supposedly Philip Wadler)</li>
+<li>Burritos from: Abstraction, intuition, and the “monad tutorial fallacy” by Brent Yorgey</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="the-m-word" class="slide level2">
+<h1>The “M” word</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">class</span> <span class="dt">Applicative</span> m <span class="ot">=&gt;</span> <span class="dt">Monad</span> m <span class="kw">where</span>
+    <span class="co">-- Usually called &quot;bind&quot;</span>
+<span class="ot">    (&gt;&gt;=) ::</span> m a <span class="ot">-&gt;</span> (a <span class="ot">-&gt;</span> m b) <span class="ot">-&gt;</span> m b
+<span class="ot">    (&gt;&gt;) ::</span> m a <span class="ot">-&gt;</span> m b <span class="ot">-&gt;</span> m b
+<span class="ot">    return ::</span> a <span class="ot">-&gt;</span> m a
+<span class="ot">    fail ::</span> <span class="dt">String</span> <span class="ot">-&gt;</span> m a
+
+<span class="kw">instance</span> <span class="dt">Monad</span> <span class="dt">Parser</span> <span class="kw">where</span>
+  (<span class="fu">&gt;&gt;=</span>) <span class="fu">=</span> inject
+  (<span class="fu">&gt;&gt;</span>) <span class="fu">=</span> (<span class="fu">*&gt;</span>)
+  return <span class="fu">=</span> pure
+  fail <span class="fu">=</span> failParser</code></pre></div>
+<aside class="notes">
+<ul>
+<li><code>Applicative</code> constraint as of GHC 7.10 (AMP)</li>
+<li><code>return</code> and <code>(*&gt;)</code> have these by default.</li>
+<li><code>fail</code> is considered a wart; used for pattern matching failures</li>
+<li>Replace <code>fail</code> with a new class (e.g. <code>MonadPlus</code>)?</li>
+<li>Parsers possibly only semi-valid use of <code>fail</code>.</li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="strings-again" class="slide level2">
+<h1>Strings again</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">parseString ::</span> <span class="dt">Parser</span> <span class="dt">String</span>
+parseString <span class="fu">=</span> <span class="kw">do</span> n <span class="ot">&lt;-</span> parseInt
+                 char <span class="ch">&#39;:&#39;</span>
+                 exactly n next
+
+<span class="ot">parseBString ::</span> <span class="dt">Parser</span> <span class="dt">Bencode</span>
+parseBString <span class="fu">=</span> <span class="dt">BString</span> <span class="fu">&lt;$&gt;</span> parseString</code></pre></div>
+<aside class="notes">
+<ul>
+<li>Sequential-style operations!</li>
+<li>“In short, Haskell is the world’s finest imperative programming language.” (SPJ, “Tackling the Awkward Squad”)</li>
+<li><code>a &lt;- m; ...</code> equivalent to <code>m &gt;&gt;= (\a -&gt; ...)</code></li>
+<li><code>m1; m2</code> equivalent to <code>m1 &gt;&gt; m2</code></li>
+</ul>
+</aside>
+<dl>
+</dl>
+</section><section id="finishing-it-off" class="slide level2">
+<h1>Finishing it off</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">parseBList ::</span> <span class="dt">Parser</span> <span class="dt">Bencode</span>
+parseBList <span class="fu">=</span> <span class="dt">BList</span> <span class="fu">&lt;$&gt;</span> bracket (char <span class="ch">&#39;l&#39;</span>) (char <span class="ch">&#39;e&#39;</span>)
+                               (many parseBencode)
+
+<span class="ot">parseBDict ::</span> <span class="dt">Parser</span> <span class="dt">Bencode</span>
+parseBDict <span class="fu">=</span> <span class="dt">BDict</span> <span class="fu">&lt;$&gt;</span> bracket (char <span class="ch">&#39;d&#39;</span>) (char <span class="ch">&#39;e&#39;</span>) (many parseKV)
+  <span class="kw">where</span>
+    parseKV <span class="fu">=</span> liftA2 (,) parseString parseBencode
+
+<span class="ot">parseBencode ::</span> <span class="dt">Parser</span> <span class="dt">Bencode</span>
+parseBencode <span class="fu">=</span> oneOf [ parseBInt, parseBString
+                     , parseBList, parseBDict
+                     ]</code></pre></div>
+<aside class="notes">
+<ul>
+<li>Mutual recursion is fun!</li>
 </ul>
 </aside>
 <dl>
