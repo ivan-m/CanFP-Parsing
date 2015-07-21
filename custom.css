@@ -5,11 +5,7 @@
     color: FireBrick;
 }
 
-
 .reveal pre {
     width: 100%;
-    /*
-    font-size: 0.4em;
-    margin: 10px auto;
-   */
+    font-size: 0.8em;
 }
