@@ -239,6 +239,21 @@ Notes
     * `runP` runs the parser
     * Specialised version of State Monad
 
+Let's start parsing!
+====================
+
+## Create basic parsers
+
+~~~haskell
+-- Lift a value into a parser.
+toParser :: a -> Parser a
+toParser a = P $ \str -> (OK a, str)
+
+-- Throw a parser error.
+failParser :: String -> Parser a
+failParser err = P $ \str -> (Err err, str)
+~~~
+
 ---
 # reveal.js settings
 theme: night
