@@ -94,10 +94,28 @@ Notes
 ## What about Parser Generators?
 
 Notes
-:    * Requires a grammar
+:    * *Requires* a grammar
+     * Combinators easier to extend
      * Probably faster
      * Can emulate in a parser combinator
      * Not embeddable in code
+     * Usually needs an external tool
+
+## Availability of parser combinators
+
+* Most (all?) FP languages
+* Javascript
+* R
+* Java
+* C#
+* etc.
+
+Notes
+:   * Multiple implementations (parsec, attoparsec, polyparse,
+      trifecta, etc.)
+    * Rite of passage!
+    * If Java has it, *of course* C# has to have it to prove they're
+      better...
 
 Bencode
 =======
