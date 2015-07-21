@@ -13,6 +13,10 @@ cache:
     - $HOME/.cabal
     - $HOME/.ghc
 
+before-cache:
+  # Don't cache the Hackage index
+  - rm -rf $HOME/cabal/packages/hackage.haskell.org
+
 branches:
   only:
     - master
