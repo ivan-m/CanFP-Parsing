@@ -8,7 +8,7 @@ date: 22 July, 2015
 About this talk
 ===============
 
-## Feel free to yell out!
+## Feel free to yell out! {data-background="images/yell.jpg" data-background-color="white"}
 
 ## Who is this guy? {data-background="images/huh.jpg" data-background-color="lightblue"}
 
