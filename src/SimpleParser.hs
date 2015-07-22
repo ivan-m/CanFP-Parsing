@@ -102,8 +102,7 @@ exactly n p
 
 -- | Try to parse one of the provided parsers in sequence.
 oneOf :: [Parser a] -> Parser a
-oneOf []     = fail "No parsers remaining"
-oneOf (p:ps) = p <|> oneOf ps
+oneOf = foldr (<|>) (fail "No parsers remaining")
 
 -- -----------------------------------------------------------------------------
 -- Defining low-level helper functions.

@@ -497,6 +497,7 @@ Notes
 :   * This class comes from parser libraries
     * Parsec still (?) uses it's own `<|>`.
     * Comes with `many` and `some` (which I called `atLeastOnce`).
+    * `oneOf` can be implemented with foldr
 
 ## Finally, we have Integers!
 
