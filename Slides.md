@@ -629,6 +629,93 @@ Notes
 (OK (BList [BString "Parsing",BString "Bencode"]),"")
 ~~~
 
+Where to from here?
+===================
+
+## Improve current parser
+
+* Negative numbers
+* Ensure `-0` is illegal
+* Strings can't have negative length
+* Parse bytes, not characters
+* Improve error messages
+
+Notes
+:   * Source already supports -ve numbers
+
+## Write a better Parser?
+
+> **Datatypes are awesome...**
+
+. . .
+
+> **... but functions are even *more* awesome!**
+
+Notes
+:   * Avoid context-switching on the `Result` type.
+
+## Continuation Parsing Style
+
+Some helper definitions first:
+
+~~~haskell
+type Failure   r = String -> ErrMsg -> Result r
+type Success a r = String -> a      -> Result r
+
+data Result a = Err String ErrMsg
+              | OK String a
+              deriving (Eq, Ord, Show, Read)
+
+-- To avoid mixing our types up.
+type ErrMsg = String
+~~~
+
+Notes
+:   * Note different definition of `Result`.
+    * Based loosely upon `attoparsec`
+
+## CPS Parser
+
+~~~haskell
+{-# LANGUAGE RankNTypes #-}
+
+newtype Parser a = P {
+      runP :: forall r. String
+           -> Failure   r
+           -> Success a r
+           -> Result r
+    }
+~~~
+
+## Running a CPS Parser
+
+~~~haskell
+failK :: Failure a
+failK str msg = Err str msg
+
+successK :: Success a a
+successK str a = OK str a
+
+runParser :: Parser a -> String -> Result a
+runParser p str = runP p str failK successK
+~~~
+
+## Exercise
+
+> **Complete the CPS parser definition!**
+
+. . .
+
+> **Once you have the instances and `next` defined, the rest should be
+> (almost) identical.**
+
+Notes
+:   Source definition not yet complete, will be Real Soon Now (TM).
+
+## So long and thanks for all the fish! {data-background="images/fish.jpg" data-background-color="lightblue"}
+
+###### [Picture](https://www.flickr.com/photos/zest-pk/923931403) by Zest-pk / [CC BY]
+
 ---
 # License links
 ...
