@@ -4,7 +4,6 @@ author: Ivan Lazar Miljenovic
 date: 22 July, 2015
 ...
 
-
 About this talk
 ===============
 
@@ -149,7 +148,6 @@ Strings              `4:spam`
 Lists             `l4:spami42ee`
 Dictionaries   `d3:bar4:spam3:fooi42ee`
 
-
 Notes
 :   * Suggested by Mats H
     * Dictionaries require keys to be strings
@@ -182,7 +180,6 @@ Defining the Parser
 ===================
 
 ## What is a parser?
-
 
 ~~~haskell
 type Parser a = String -> a
@@ -231,13 +228,11 @@ Notes
 
 ## Final definition
 
-
 ~~~haskell
 newtype Parser a = P { runP :: String -> (Result a, String) }
 ~~~
 
 . . .
-
 
 ~~~haskell
 -- Shhhhhh!!!!!
@@ -520,7 +515,6 @@ parseBInt = BInt <$> bracket (char 'i') (char 'e') parseInt
 > 3. Return the next `n` characters
 
 . . .
-
 
 ~~~haskell
 parseString :: Parser String
