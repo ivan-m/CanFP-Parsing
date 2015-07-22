@@ -622,6 +622,13 @@ parseBencode = oneOf [ parseBInt, parseBString
 Notes
 :   * Mutual recursion is fun!
 
+## Trying it out
+
+~~~haskell
+λ> runP parseBencode "l7:Parsing7:Bencodee"
+(OK (BList [BString "Parsing",BString "Bencode"]),"")
+~~~
+
 ---
 # License links
 ...
