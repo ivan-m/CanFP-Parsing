@@ -705,7 +705,8 @@ runParser p str = runP p str failK successK
 > (almost) identical.**
 
 Notes
-:   Source definition not yet complete, will be Real Soon Now (TM).
+:   Differences are based upon whether you used class methods or the
+    functions that implemented them.
 
 ## So long and thanks for all the fish! {data-background="images/fish.jpg" data-background-color="lightblue"}
 
