@@ -9,11 +9,11 @@ About this talk
 
 ## Feel free to yell out! {data-background="images/yell.jpg" data-background-color="white"}
 
-###### [Picture](https://www.flickr.com/photos/otacke/12635014673) by Oliver Tacke / [CC BY]
+###### [Vortrag] by Oliver Tacke / [CC BY]
 
 ## Who is this guy? {data-background="images/huh.jpg" data-background-color="lightblue"}
 
-###### [Picture](https://www.flickr.com/photos/jumpn_around/2239989214/) by elio m. / [CC BY-NC]
+###### [huh?] by elio m. / [CC BY-NC]
 
 Notes
 :   * Using Haskell since late 2007
@@ -59,7 +59,7 @@ Notes
 
 > **Now you have two problems.**
 
-###### [Picture](https://www.flickr.com/photos/jeremybrooks/2199355153/) by Jeremy Brooks / [CC BY-NC]
+###### [Shock Shock Horror Horror] by Jeremy Brooks / [CC BY-NC]
 
 Notes
 :   * She even admits regexes are often the wrong solution.
@@ -174,7 +174,7 @@ data Bencode = BInt Int
              deriving (Show)
 ~~~
 
-###### [Picture](https://www.flickr.com/photos/33774513@N08/3153440876/) by crises_crs / [CC BY-NC]
+###### [Bboy and his friends] by crises_crs / [CC BY-NC]
 
 Defining the Parser
 ===================
@@ -708,14 +708,20 @@ Notes
 
 ## So long and thanks for all the fish! {data-background="images/fish.jpg" data-background-color="lightblue"}
 
-###### [Picture](https://www.flickr.com/photos/zest-pk/923931403) by Zest-pk / [CC BY]
+###### [leaping_dolphins] by Zest-pk / [CC BY]
 
 ---
-# License links
+# Various links
 ...
 
 [CC BY]: https://creativecommons.org/licenses/by/2.0/
 [CC BY-NC]: https://creativecommons.org/licenses/by-nc/2.0/
+
+[Vortrag]: https://www.flickr.com/photos/otacke/12635014673
+[huh?]: https://www.flickr.com/photos/jumpn_around/2239989214/
+[Shock Shock Horror Horror]: https://www.flickr.com/photos/jeremybrooks/2199355153/
+[Bboy and his friends]: https://www.flickr.com/photos/33774513@N08/3153440876/
+[leaping_dolphins]: https://www.flickr.com/photos/zest-pk/923931403
 
 ---
 # reveal.js settings
