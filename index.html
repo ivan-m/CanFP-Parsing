@@ -731,6 +731,10 @@ parseBencode <span class="fu">=</span> oneOf [ parseBInt, parseBString
 </aside>
 <dl>
 </dl>
+</section><section id="trying-it-out" class="slide level2">
+<h1>Trying it out</h1>
+<div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell">λ<span class="fu">&gt;</span> runP parseBencode <span class="st">&quot;l7:Parsing7:Bencodee&quot;</span>
+(<span class="dt">OK</span> (<span class="dt">BList</span> [<span class="dt">BString</span> <span class="st">&quot;Parsing&quot;</span>,<span class="dt">BString</span> <span class="st">&quot;Bencode&quot;</span>]),<span class="st">&quot;&quot;</span>)</code></pre></div>
 </section></section>
     </div>
   </div>
