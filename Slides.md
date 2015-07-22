@@ -174,6 +174,9 @@ data Bencode = BInt Int
              deriving (Show)
 ~~~
 
+Notes
+:   Implemented in `Bencode.hs`
+
 ###### [Bboy and his friends] by crises_crs / [CC BY-NC]
 
 Defining the Parser
@@ -243,6 +246,7 @@ Notes
 :   * Don't export constructor
     * `runP` runs the parser
     * `newtype` is run-time isomorphic to original
+    * Implemented in `SimpleParser.hs`
     * Specialised version of State Monad
 
 Let's start parsing!
@@ -681,6 +685,9 @@ newtype Parser a = P {
            -> Result r
     }
 ~~~
+
+Notes
+:   Implemented in `CPSParser.hs`
 
 ## Running a CPS Parser
 
