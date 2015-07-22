@@ -288,6 +288,11 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
              <span class="fu">|</span> <span class="dt">BList</span> [<span class="dt">Bencode</span>]
              <span class="fu">|</span> <span class="dt">BDict</span> [(<span class="dt">String</span>, <span class="dt">Bencode</span>)]
              <span class="kw">deriving</span> (<span class="dt">Show</span>)</code></pre></div>
+<aside class="notes">
+Implemented in <code>Bencode.hs</code>
+</aside>
+<dl>
+</dl>
 <h6 id="bboy-and-his-friends-by-crises_crs-cc-by-nc"><a href="https://www.flickr.com/photos/33774513@N08/3153440876/">Bboy and his friends</a> by crises_crs / <a href="https://creativecommons.org/licenses/by-nc/2.0/">CC BY-NC</a></h6>
 </div>
 </section></section>
@@ -357,6 +362,7 @@ code > span.in { color: #7f9f7f; font-weight: bold; } /* Information */
 <li>Don’t export constructor</li>
 <li><code>runP</code> runs the parser</li>
 <li><code>newtype</code> is run-time isomorphic to original</li>
+<li>Implemented in <code>SimpleParser.hs</code></li>
 <li>Specialised version of State Monad</li>
 </ul>
 </aside>
@@ -800,6 +806,11 @@ parseBencode <span class="fu">=</span> oneOf [ parseBInt, parseBString
            <span class="ot">-&gt;</span> <span class="dt">Success</span> a r
            <span class="ot">-&gt;</span> <span class="dt">Result</span> r
     }</code></pre></div>
+<aside class="notes">
+Implemented in <code>CPSParser.hs</code>
+</aside>
+<dl>
+</dl>
 </section><section id="running-a-cps-parser" class="slide level2">
 <h1>Running a CPS Parser</h1>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="ot">failK ::</span> <span class="dt">Failure</span> a
@@ -820,7 +831,7 @@ runParser p str <span class="fu">=</span> runP p str failK successK</code></pre>
 <p><strong>Once you have the instances and <code>next</code> defined, the rest should be (almost) identical.</strong></p>
 </blockquote>
 <aside class="notes">
-Source definition not yet complete, will be Real Soon Now (TM).
+Differences are based upon whether you used class methods or the functions that implemented them.
 </aside>
 <dl>
 </dl>
