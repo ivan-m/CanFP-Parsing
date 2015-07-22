@@ -14,5 +14,6 @@ cabal-version:       >=1.10
 library
   exposed-modules:     Bencode
                      , SimpleParser
+                     , CPSParser
   build-depends:       base < 5
   default-language:    Haskell2010
