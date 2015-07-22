@@ -434,7 +434,7 @@ satisfy p <span class="fu">=</span> next <span class="ot">`inject`</span> checkN
 <h1>Getting multiple digits</h1>
 <div class="sourceCode"><pre class="sourceCode haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Char</span>(isDigit)
 
-<span class="ot">atLeastOnce ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> [<span class="dt">Parser</span> a]
+<span class="ot">atLeastOnce ::</span> <span class="dt">Parser</span> a <span class="ot">-&gt;</span> <span class="dt">Parser</span> [a]
 atLeastOnce <span class="fu">=</span> <span class="co">-- to be implemented</span>
 
 <span class="ot">parseIntDigits ::</span> <span class="dt">Parser</span> <span class="dt">String</span>
