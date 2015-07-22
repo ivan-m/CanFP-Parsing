@@ -321,7 +321,7 @@ Notes
 ~~~haskell
 import Data.Char(isDigit)
 
-atLeastOnce :: Parser a -> [Parser a]
+atLeastOnce :: Parser a -> Parser [a]
 atLeastOnce = -- to be implemented
 
 parseIntDigits :: Parser String
